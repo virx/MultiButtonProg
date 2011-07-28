@@ -12,6 +12,19 @@ Default_conf
 |tab|sample_tab|
 term_hello
 py_hello
+term_ls
+firefoxx4
+
+|tab|cyphesis|
+set_lib_path
+purge_world
+purge_rules
+cyloadrules
+cyconfig
+start_cyphesis
+cyclient
+kill_cyphesis
+cyphesis_all_in_one
 
 |tab|sample_tab|
 term_hello
@@ -58,9 +71,63 @@ print 'config_back.txt loaded ...'
 echo "Hello1"
 echo "Hello2"
 
+|command|terminal|term_ls|
+ls
+
+|command|terminal|set_lib_path|
+export LD_LIBRARY_PATH=~/wf/local/lib:$LD_LIBRARY_PATH
+echo 'LD_LIBRARY_PATH set'
+
+|command|terminal|purge_world|
+~/wf/local/bin/cydb world purge
+echo 'world purged'
+
+|command|terminal|purge_rules|
+~/wf/local/bin/cydb rules purge
+echo 'rules purged'
+
+|command|terminal|cyloadrules|
+~/wf/local/bin/cyloadrules
+echo 'rules loaded'
+
+|command|terminal|cyconfig|
+~/wf/local/bin/cyconfig
+echo 'cyphesis configured'
+
+|command|terminal|start_cyphesis|
+~/wf/local/bin/cyphesis
+echo 'cyphesis started'
+
+|command|terminal|cyclient|
+~/wf/local/bin/cyclient
+echo 'cyclient executed'
+
+|command|terminal|kill_cyphesis|
+killall cyphesis
+echo 'cyphesis killing finished'
+
+|command|terminal|cyphesis_all_in_one|
+export LD_LIBRARY_PATH=~/wf/local/lib:$LD_LIBRARY_PATH
+echo 'LD_LIBRARY_PATH set'
+~/wf/local/bin/cydb world purge
+echo 'world purged'
+~/wf/local/bin/cydb rules purge
+echo 'rules purged'
+~/wf/local/bin/cyconfig
+echo 'cyphesis configured'
+~/wf/local/bin/cyphesis
+echo 'cyphesis started'
+
+|command|terminal|firefoxx4|
+firefox
+firefox
+firefox
+firefox
+
 |command|python|py_hello|
 print "Hello1"
 print "Hello2"
+
 
 
 

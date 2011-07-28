@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from Tkinter import *
+import subprocess
 import os
 
 print """MultiButtonProg  Copyright (C) 2011  Virgo Pihlapuu
@@ -67,19 +68,23 @@ def parse_conf():
 
 # execute terminal command sequence
 def call_com_term(t_i):
-	for line in coms[t_i][2].split('\n'):
-		print 'Button with terminal command called: %r' % line
-		if os.name in ['nt', 'dos', 'os2'] :
-		   # dos
-		   pipe = os.popen(line)
-		else :
-		   # unix
-		   pipe = os.popen(line)
-		text = pipe.read()
-		sts = pipe.close()
-		if sts is None: sts = ''
-		t.insert(END, sts)
-		t.insert(END, text)
+	#for line in coms[t_i][2].split('\n'):
+	l = coms[t_i][2]
+	#print 'Button with terminal command called: %r' % line
+	#if os.name in ['nt', 'dos', 'os2'] :
+	   # dos
+	   #pipe = os.system(l)
+	#else :
+	   # unix
+	   #pipe = os.system(l)
+	p = subprocess.Popen(l, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+	txt = ''
+	for line in p.stdout.readlines():
+		txt += line
+	retval = p.wait()
+
+	#if sts is None: sts = ''
+	t.insert(END, txt)
 
 # execute python script
 def call_com_py(c_i):
