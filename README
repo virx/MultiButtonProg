@@ -1,0 +1,32 @@
+MultiButtonProg program should help working with multiple terminals and commands.
+Copyright (C) 2011  Virgo Pihlapuu
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+Feel free to contact me: <virx15@gmail.com>
+
+1. Description
+================================================
+ - Execute cunfigurable terminal command sequences with button click.
+ - Multiple terminals running in different tabs.
+ - Shell command executes on active tab or select first free tag and
+   warns user about new terminal tab activation. Creates new terminal tab, 
+   if all current tabs are busy. If same command is already busy, alert 
+   asks if want to run same command in new tab.
+ - Command sequence buttons can be sectioned into different tabs.
+ - Active terminal tab and actionbar tab are related and will be updated
+   after every use of command in specific tab.
+ - Default terminal tab name is first word of the command and number of 
+   same commands running already.
+ - Tab names and command buttons are saved into text file.

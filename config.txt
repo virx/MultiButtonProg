@@ -1,0 +1,66 @@
+# Here are defined all the tabs and commands.
+# Lines starting with # are ignored.
+# Lines starting with "|" define tab or command button
+# Lines below defined tab line are buttons that appear in this tab
+# Lines below defined command define the python script or
+
+|tab|config|
+Open_conf
+Save_conf
+Default_conf
+
+|tab|sample_tab|
+term_hello
+py_hello
+
+|tab|sample_tab|
+term_hello
+py_hello
+term_hello
+py_hello
+term_hello
+py_hello
+term_hello
+py_hello
+
+|command|python|Open_conf|
+f=open('config.txt','r')
+fs = f.read()
+f.close()
+t.delete(0.0, END)
+t.insert(END, fs)
+print 'config.txt open ...'
+
+|command|python|Open_conf_2|
+f=open('config.txt','r')
+fs = f.read()
+f.close()
+t.delete(0.0, END)
+t.insert(END, fs)
+print 'config.txt open ...'
+
+|command|python|Save_conf|
+ts=t.get('0.0','10000.1000')
+f=open('config.txt','w')
+f.write(ts)
+f.close()
+print 'config.txt saved ...'
+
+|command|python|Default_conf|
+f=open('conf_back.txt','r')
+fs = f.read()
+f.close()
+t.delete(0.0, END)
+t.insert(END, fs)
+print 'config_back.txt loaded ...'
+
+|command|terminal|term_hello|
+echo "Hello1"
+echo "Hello2"
+
+|command|python|py_hello|
+print "Hello1"
+print "Hello2"
+
+
+
