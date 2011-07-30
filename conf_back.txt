@@ -2,28 +2,29 @@
 # Lines starting with # are ignored.
 # Lines starting with "|" define tab or command button
 # Lines below defined tab line are buttons that appear in this tab
-# Lines below defined command define the python script or
+# Lines below defined command define the script to run
+# NOTE: python script are run inside the same script with exec function
 
 |tab|config|
 Open_conf
 Save_conf
 Default_conf
+Start_new
 
 |tab|sample_tab|
 term_hello
 py_hello
+start_firefox_x2
 
-|tab|sample_tab|
-term_hello
-py_hello
-term_hello
-py_hello
-term_hello
-py_hello
-term_hello
-py_hello
+|tab|worldforge|
+start_cyphesis
+kill_cyphesis
+start_ember
+kill_ember
 
-|command|python|Open_conf|
+|command|py|Open_conf|
+global update_timer
+update_timer = False
 f=open('config.txt','r')
 fs = f.read()
 f.close()
@@ -31,7 +32,7 @@ t.delete(0.0, END)
 t.insert(END, fs)
 print 'config.txt open ...'
 
-|command|python|Open_conf_2|
+|command|py|Open_conf_2|
 f=open('config.txt','r')
 fs = f.read()
 f.close()
@@ -39,14 +40,14 @@ t.delete(0.0, END)
 t.insert(END, fs)
 print 'config.txt open ...'
 
-|command|python|Save_conf|
+|command|py|Save_conf|
 ts=t.get('0.0','10000.1000')
 f=open('config.txt','w')
 f.write(ts)
 f.close()
 print 'config.txt saved ...'
 
-|command|python|Default_conf|
+|command|py|Default_conf|
 f=open('conf_back.txt','r')
 fs = f.read()
 f.close()
@@ -54,10 +55,36 @@ t.delete(0.0, END)
 t.insert(END, fs)
 print 'config_back.txt loaded ...'
 
-|command|terminal|term_hello|
+|command|sh|term_hello|
 echo "Hello1"
 echo "Hello2"
 
-|command|python|py_hello|
+|command|sh|start_cyphesis|
+export LD_LIBRARY_PATH=~/wf/local/lib:$LD_LIBRARY_PATH
+echo 'LD_LIBRARY_PATH set'
+~/wf/local/bin/cyphesis
+echo 'cyphesis run finished'
+
+|command|sh|start_ember|
+export LD_LIBRARY_PATH=~/wf/local/lib:$LD_LIBRARY_PATH
+echo 'LD_LIBRARY_PATH set'
+~/wf/local/bin/ember
+echo 'ember run finished'
+
+|command|sh|kill_cyphesis|
+killall cyphesis
+
+|command|sh|kill_ember|
+killall ember
+
+|command|sh|start_firefox_x2|
+firefox
+firefox
+
+|command|sh|Start_new|
+python mbp.py
+
+|command|py|py_hello|
 print "Hello1"
 print "Hello2"
+

@@ -2,41 +2,29 @@
 # Lines starting with # are ignored.
 # Lines starting with "|" define tab or command button
 # Lines below defined tab line are buttons that appear in this tab
-# Lines below defined command define the python script or
+# Lines below defined command define the script to run
+# NOTE: python script are run inside the same script with exec function
 
 |tab|config|
 Open_conf
 Save_conf
 Default_conf
+Start_new
 
 |tab|sample_tab|
 term_hello
 py_hello
-term_ls
-firefoxx4
+start_firefox_x2
 
-|tab|cyphesis|
-set_lib_path
-purge_world
-purge_rules
-cyloadrules
-cyconfig
+|tab|worldforge|
 start_cyphesis
-cyclient
 kill_cyphesis
-cyphesis_all_in_one
+start_ember
+kill_ember
 
-|tab|sample_tab|
-term_hello
-py_hello
-term_hello
-py_hello
-term_hello
-py_hello
-term_hello
-py_hello
-
-|command|python|Open_conf|
+|command|py|Open_conf|
+global update_timer
+update_timer = False
 f=open('config.txt','r')
 fs = f.read()
 f.close()
@@ -44,7 +32,7 @@ t.delete(0.0, END)
 t.insert(END, fs)
 print 'config.txt open ...'
 
-|command|python|Open_conf_2|
+|command|py|Open_conf_2|
 f=open('config.txt','r')
 fs = f.read()
 f.close()
@@ -52,14 +40,14 @@ t.delete(0.0, END)
 t.insert(END, fs)
 print 'config.txt open ...'
 
-|command|python|Save_conf|
+|command|py|Save_conf|
 ts=t.get('0.0','10000.1000')
 f=open('config.txt','w')
 f.write(ts)
 f.close()
 print 'config.txt saved ...'
 
-|command|python|Default_conf|
+|command|py|Default_conf|
 f=open('conf_back.txt','r')
 fs = f.read()
 f.close()
@@ -67,67 +55,36 @@ t.delete(0.0, END)
 t.insert(END, fs)
 print 'config_back.txt loaded ...'
 
-|command|terminal|term_hello|
+|command|sh|term_hello|
 echo "Hello1"
 echo "Hello2"
 
-|command|terminal|term_ls|
-ls
-
-|command|terminal|set_lib_path|
+|command|sh|start_cyphesis|
 export LD_LIBRARY_PATH=~/wf/local/lib:$LD_LIBRARY_PATH
 echo 'LD_LIBRARY_PATH set'
-
-|command|terminal|purge_world|
-~/wf/local/bin/cydb world purge
-echo 'world purged'
-
-|command|terminal|purge_rules|
-~/wf/local/bin/cydb rules purge
-echo 'rules purged'
-
-|command|terminal|cyloadrules|
-~/wf/local/bin/cyloadrules
-echo 'rules loaded'
-
-|command|terminal|cyconfig|
-~/wf/local/bin/cyconfig
-echo 'cyphesis configured'
-
-|command|terminal|start_cyphesis|
 ~/wf/local/bin/cyphesis
-echo 'cyphesis started'
+echo 'cyphesis run finished'
 
-|command|terminal|cyclient|
-~/wf/local/bin/cyclient
-echo 'cyclient executed'
+|command|sh|start_ember|
+export LD_LIBRARY_PATH=~/wf/local/lib:$LD_LIBRARY_PATH
+echo 'LD_LIBRARY_PATH set'
+~/wf/local/bin/ember
+echo 'ember run finished'
 
-|command|terminal|kill_cyphesis|
+|command|sh|kill_cyphesis|
 killall cyphesis
-echo 'cyphesis killing finished'
 
-|command|terminal|cyphesis_all_in_one|
-export LD_LIBRARY_PATH=~/wf/local/lib:$LD_LIBRARY_PATH
-echo 'LD_LIBRARY_PATH set'
-~/wf/local/bin/cydb world purge
-echo 'world purged'
-~/wf/local/bin/cydb rules purge
-echo 'rules purged'
-~/wf/local/bin/cyconfig
-echo 'cyphesis configured'
-~/wf/local/bin/cyphesis
-echo 'cyphesis started'
+|command|sh|kill_ember|
+killall ember
 
-|command|terminal|firefoxx4|
-firefox
-firefox
+|command|sh|start_firefox_x2|
 firefox
 firefox
 
-|command|python|py_hello|
+|command|sh|Start_new|
+python mbp.py
+
+|command|py|py_hello|
 print "Hello1"
 print "Hello2"
-
-
-
 

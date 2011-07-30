@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from Tkinter import *
 import subprocess
 import os
+import time
 
 print """MultiButtonProg  Copyright (C) 2011  Virgo Pihlapuu
 
@@ -65,38 +66,53 @@ def parse_conf():
 			coms_new.append([fs_arr[fs_i+1], fs_arr[fs_i+2], fs_arr[fs_i+3]])
 		fs_i += 1
 	return tabs_new, coms_new
+	
+# return path of log file for current tab
+def cur_tab_log_file():
+	global cur_tab
+	return "log/"+ tabs[cur_tab][0].strip() +".txt"
+	
+# update current tab string in text area
+def update_cur_tab_log():
+	fs = read_log(cur_tab)
+	#print "log updated because program thinks log file has new content"
+	t.delete(0.0, END)
+	t.insert(END, fs)
+	t.yview(END)
 
-# execute terminal command sequence
-def call_com_term(t_i):
-	#for line in coms[t_i][2].split('\n'):
-	l = coms[t_i][2]
-	#print 'Button with terminal command called: %r' % line
-	#if os.name in ['nt', 'dos', 'os2'] :
-	   # dos
-	   #pipe = os.system(l)
-	#else :
-	   # unix
-	   #pipe = os.system(l)
-	p = subprocess.Popen(l, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-	txt = ''
-	for line in p.stdout.readlines():
-		txt += line
-	retval = p.wait()
-
-	#if sts is None: sts = ''
-	t.insert(END, txt)
+# append string to the end of current tab log file
+def append_tab_log(msg):
+	fn = cur_tab_log_file()
+	with open(fn, 'a') as f:
+		f.write(msg)
+	f.close()
 
 # execute python script
 def call_com_py(c_i):
 	#print 'Button with python command called: %r' % c_i
 	#print 'I will execute this: %r' % coms[c_i][2]
+	
+	append_tab_log("===========================================================================\n"+
+	"PYTHON SCRIPT: "+ coms[c_i][1] +"\n")
 	exec(coms[c_i][2])
 
-# Edit configure file
-def sel_conf():
-	t.delete(0.0, END)
-	fs = read_conf()
-	t.insert(END, fs)
+# executes button command as unix shell script
+def call_com_sh(c_i):
+	lfp = cur_tab_log_file()
+	l = "./scripts/sh/"+ coms[c_i][1] +".sh >> '"+ lfp +"' 2>>'"+ lfp +"'"
+	append_tab_log("==========================================================================\n"+
+	"SHELL SCRIPT: "+ l +"\n")
+	p = subprocess.Popen(l, shell=True)
+	
+# execute cmd script
+def call_com_cmd(c_i):
+	print 'Button with cmd command called: %r' % c_i
+	lfp = cur_tab_log_file()
+	l = "./scripts/cmd/"+ coms[c_i][1] +".cmd"
+	append_tab_log("==========================================================================\n"+
+	"******** WARNING: this is cmd script and the output is not saved in file **********\n"+
+	"CMD SCRIPT: "+ l +"\n")
+	p = subprocess.Popen(l, shell=True)
 
 # Arrange the buttons related to window size
 def relocate_buttons(tt, xxx):
@@ -115,10 +131,12 @@ def relocate_buttons(tt, xxx):
 		x_sum += btx
 		cl += 1
 		
+# try to set pane separators to default position		
 def reset_panes(yy):
-	m1.sash_place(0, 0, 50)
-	m1.sash_place(1, 0, (yy - 50))
+	m1.sash_place(0, 0, 45)
+	m1.sash_place(1, 0, (yy - 80))
 	
+# called when window size changes
 def change_window(event):
 	reset_widget_sizes(event.width, event.height)
 
@@ -131,10 +149,13 @@ def reset_widget_sizes(xx,yy):
 
 # do things when tab button is clicked
 def sel_tab(tbn):
-	t.delete(0.0, END)
-	fs = read_log(tbn)
-	t.insert(END, fs)
+	global cur_tab, wx, wy, update_timer
 	cur_tab = tbn
+	wx = root.winfo_width()
+	wy = root.winfo_height()
+	update_timer = True
+	
+	update_cur_tab_log()
 	# change background colors of tab buttons
 	# change order of command button frames
 	for tbi in range(0,len(tabs)):
@@ -147,6 +168,8 @@ def sel_tab(tbn):
 	for tbi in range(0,len(tabs)):
 		if tbi != cur_tab:
 			exec("f_bot_%r.grid(sticky=N+S+E+W)" % tbi)
+	reset_widget_sizes(wx,wy)
+	timed_log_update()
 	#print "changed tab to %r" % cur_tab
 	
 # return list with color values
@@ -159,27 +182,63 @@ def make_colors(n):
 
 # make folder and files for tab logs
 def files_folders():
-	try:
-		os.makedirs('log')
-	except OSError:
-		pass
+	folder_list = ['log','scripts','scripts/py','scripts/sh','scripts/cmd']
+	for folder in folder_list:
+		# try to make log dir
+		try:
+			os.makedirs(folder)
+		except OSError:
+			pass
+			
+	# make log files for tab content
 	ti = 0
 	for tab in tabs:
 		fn = "log/"+ tabs[ti][0].strip() +".txt"
-		with open(fn, 'w') as f:
-			pass
-		f.close()	
+		try:
+			with open(fn, 'r') as f:
+				pass
+			f.close()
+		except:
+			with open(fn, 'w') as f:
+				pass
+			f.close()
 		ti += 1
+	ci = 0
+	
+	# make script files into folders
+	for com in coms:
+		fn = "scripts/"+ com[0].strip() +"/"+ com[1].strip() +"."+ com[0].strip()
+		# make script file for button action
+		with open(fn, 'w') as f:
+			f.write(com[2])
+		f.close()
+		# make button script file executable
+		make_exec = "chmod +x "+fn
+		subprocess.Popen(make_exec, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+		ci += 1
+
+# update text field if log file has changed
+def timed_log_update():
+	#print "timed_log_update called"
+	global tab_log_old_size, update_timer
+	if update_timer:
+		if tab_log_old_size != os.path.getsize(cur_tab_log_file()):
+			tab_log_old_size = os.path.getsize(cur_tab_log_file())
+			update_cur_tab_log()
+			#print "tab text updated bacause log file has new content"
+		root.after(2000, timed_log_update)
 
 # root frame
 wx = 600
 wy = 500
 scl = 100 # scale widget sizes from 1 to 100 (scale thing not working) <FIX ME>
-top_min = 50
-cent_min = 50
-bot_min = 50
-top_sash_loc = 50
-bot_sash_loc = (wy - 50)
+top_min = 45
+cent_min = 55
+bot_min = 45
+top_sash_loc = 45
+bot_sash_loc = (wy - 45)
+tab_log_old_size = 0
+update_timer  = False
 root = Tk()
 root.geometry('%rx%r+300+200' % (wx, wy))
 root.title("MultiButtonProg")
@@ -239,6 +298,7 @@ for tab in tabs:
 	exec("tbb_%r.grid(row=0, column=%r, sticky=W)" % (tn, tn))	
 	exec("f_bot_%r=Frame(f_bottom, bg=%r)" % (tn, com_tab_colors[tn]))
 	exec("f_bot_%r.grid(sticky=E+W)" % (tn))
+	
 	# init command buttons
 	ci = 0
 	b_row = 0
@@ -249,19 +309,12 @@ for tab in tabs:
 				if b_col > 5:
 					b_col = 0
 					b_row += 1
-				if cm[0] == 'python':
-					exec("cmb_%r_%r=Button(f_bot_%r, text=%r, bg=%r, command=lambda c_%r=%r: call_com_py(c_%r))" % (tn, n, tn, cm[1], com_tab_colors[tn], ci, ci, ci))
-					exec("cmb_%r_%r.grid(row=%r, column=%r, sticky=W+E)" % (tn, n, b_row, b_col))
-					b_col += 1
-				else:
-					exec("cmb_%r_%r=Button(f_bot_%r, text=%r, bg=%r, command=lambda c_%r=%r: call_com_term(c_%r))" % (tn, n, tn, cm[1], com_tab_colors[tn], ci, ci, ci))
-					exec("cmb_%r_%r.grid(row=%r, column=%r, sticky=W+E)" % (tn, n, b_row, b_col))
-					b_col += 1
+				script_type = cm[0]
+				exec("cmb_%r_%r=Button(f_bot_%r, text=%r, bg=%r, command=lambda c_%r=%r: call_com_" % (tn, n, tn, cm[1], com_tab_colors[tn], ci, ci) + script_type +"(c_%r))" % ci)
+				exec("cmb_%r_%r.grid(row=%r, column=%r, sticky=W+E)" % (tn, n, b_row, b_col))
 		ci += 1
 	tn += 1
 
 # select first tab
 
 root.mainloop()
-
-
