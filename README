@@ -14,19 +14,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+Any kind of feedback or developing help is welcome.
 Feel free to contact me: <virx15@gmail.com>
 
 1. Description
 ================================================
- - Execute cunfigurable terminal command sequences with button click.
- - Multiple terminals running in different tabs.
- - Shell command executes on active tab or select first free tag and
-   warns user about new terminal tab activation. Creates new terminal tab, 
-   if all current tabs are busy. If same command is already busy, alert 
-   asks if want to run same command in new tab.
+ - Execute cunfigurable terminal command sequences and python scripts with button click.
  - Command sequence buttons can be sectioned into different tabs.
- - Active terminal tab and actionbar tab are related and will be updated
-   after every use of command in specific tab.
- - Default terminal tab name is first word of the command and number of 
-   same commands running already.
- - Tab names and command buttons are saved into text file.
+ - Creates all necessary script files and folders.
+ - Tab and command buttons are created according to config.txt file when starting program.
