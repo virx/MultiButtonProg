@@ -21,6 +21,7 @@ from Tkinter import *
 import subprocess
 import os
 import time
+import shutil
 
 print """MultiButtonProg  Copyright (C) 2011  Virgo Pihlapuu
 
@@ -104,7 +105,7 @@ def call_com_sh(c_i):
 	"SHELL SCRIPT: "+ l +"\n")
 	p = subprocess.Popen(l, shell=True)
 	
-# execute cmd script
+# execute cmd script (not working, i have ubuntu) <FIXME>
 def call_com_cmd(c_i):
 	print 'Button with cmd command called: %r' % c_i
 	lfp = cur_tab_log_file()
@@ -139,6 +140,10 @@ def reset_panes(yy):
 # called when window size changes
 def change_window(event):
 	reset_widget_sizes(event.width, event.height)
+	global startup
+	if startup:
+		sel_tab(cur_tab)
+		startup = False
 
 # make new size and location for widgets to fit better with window
 def reset_widget_sizes(xx,yy):
@@ -182,7 +187,7 @@ def make_colors(n):
 
 # make folder and files for tab logs
 def files_folders():
-	folder_list = ['log','scripts','scripts/py','scripts/sh','scripts/cmd']
+	folder_list = ['log','log/backup','scripts','scripts/py','scripts/sh','scripts/cmd']
 	for folder in folder_list:
 		# try to make log dir
 		try:
@@ -229,6 +234,7 @@ def timed_log_update():
 		root.after(2000, timed_log_update)
 
 # root frame
+startup = True
 wx = 600
 wy = 500
 scl = 100 # scale widget sizes from 1 to 100 (scale thing not working) <FIX ME>
@@ -315,6 +321,5 @@ for tab in tabs:
 		ci += 1
 	tn += 1
 
-# select first tab
-
+# start main loop
 root.mainloop()

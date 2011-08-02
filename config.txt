@@ -10,11 +10,14 @@ Open_conf
 Save_conf
 Default_conf
 Start_new
+Overwrite_this_log
+Backup_logs
 
 |tab|sample_tab|
 term_hello
 py_hello
 start_firefox_x2
+kill_firefox
 
 |tab|worldforge|
 start_cyphesis
@@ -73,18 +76,46 @@ echo 'ember run finished'
 
 |command|sh|kill_cyphesis|
 killall cyphesis
+killall cyphesis.bin
+echo 'cyphesis killed'
 
 |command|sh|kill_ember|
 killall ember
+killall ember.bin
+echo 'ember killed. '
 
-|command|sh|start_firefox_x2|
-firefox
-firefox
+|command|sh|kill_firefox|
+killall firefox-bin
 
-|command|sh|Start_new|
-python mbp.py
+|command|sh|firefox|
+firefox
+echo 'firefox started, but is closed now.'
 
 |command|py|py_hello|
 print "Hello1"
 print "Hello2"
+
+|command|py|Overwrite_this_log|
+fn = cur_tab_log_file()
+ts=t.get('0.0','10000.1000')
+f=open(fn,'w')
+f.write(ts)
+f.close()
+print fn +' saved. '
+
+|command|py|Backup_logs|
+dirs = os.listdir('log/backup')
+back_path = "log/backup/back_%r" % len(dirs)
+try:
+	os.makedirs(back_path)
+except OSError:
+	pass
+for tab in tabs:
+	file_name = tab[0].strip() +".txt"
+	log_back_path = back_path + '/'+ file_name
+	log_source_path = 'log/'+ file_name
+	shutil.move(log_source_path, back_path)
+	files_folders()
+print "Log files moved to %r and new empty log files created" % back_path
+
 
