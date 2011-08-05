@@ -26,8 +26,8 @@ start_ember
 kill_ember
 
 |command|py|Open_conf|
-global update_timer
-update_timer = False
+global update_log
+update_log = False
 f=open('config.txt','r')
 fs = f.read()
 f.close()
@@ -36,6 +36,8 @@ t.insert(END, fs)
 print 'config.txt open ...'
 
 |command|py|Open_conf_2|
+global update_log
+update_log = False
 f=open('config.txt','r')
 fs = f.read()
 f.close()
@@ -117,5 +119,4 @@ for tab in tabs:
 	shutil.move(log_source_path, back_path)
 	files_folders()
 print "Log files moved to %r and new empty log files created" % back_path
-
 

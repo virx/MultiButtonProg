@@ -20,8 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from Tkinter import *
 import subprocess
 import os
+import sys
 import time
 import shutil
+from cStringIO import StringIO
 
 print """MultiButtonProg  Copyright (C) 2011  Virgo Pihlapuu
 
@@ -92,13 +94,21 @@ def append_tab_log(msg):
 def call_com_py(c_i):
 	#print 'Button with python command called: %r' % c_i
 	#print 'I will execute this: %r' % coms[c_i][2]
-	
-	append_tab_log("===========================================================================\n"+
-	"PYTHON SCRIPT: "+ coms[c_i][1] +"\n")
+	global update_log
+	update_log = True
+	py_str = ''
+	old_stdout = sys.stdout
+	sys.stdout = StringIO()
 	exec(coms[c_i][2])
-
+	py_str = sys.stdout.getvalue()
+	sys.stdout = old_stdout
+	append_tab_log("===========================================================================\n"+
+	"PYTHON SCRIPT: "+ coms[c_i][1] +"\n"+ py_str)
+	
 # executes button command as unix shell script
 def call_com_sh(c_i):
+	global update_log
+	update_log = True
 	lfp = cur_tab_log_file()
 	l = "./scripts/sh/"+ coms[c_i][1] +".sh >> '"+ lfp +"' 2>>'"+ lfp +"'"
 	append_tab_log("==========================================================================\n"+
@@ -107,6 +117,8 @@ def call_com_sh(c_i):
 	
 # execute cmd script (not working, i have ubuntu) <FIXME>
 def call_com_cmd(c_i):
+	global update_log
+	update_log = True
 	print 'Button with cmd command called: %r' % c_i
 	lfp = cur_tab_log_file()
 	l = "./scripts/cmd/"+ coms[c_i][1] +".cmd"
@@ -137,13 +149,19 @@ def reset_panes(yy):
 	m1.sash_place(0, 0, 45)
 	m1.sash_place(1, 0, (yy - 80))
 	
+def reset_widgets_no_arg():
+	reset_widget_sizes(root.winfo_width(), root.winfo_height())
+	
 # called when window size changes
 def change_window(event):
 	reset_widget_sizes(event.width, event.height)
 	global startup
 	if startup:
 		sel_tab(cur_tab)
+		timed_log_update()
 		startup = False
+		root.after(100, reset_widgets_no_arg)
+
 
 # make new size and location for widgets to fit better with window
 def reset_widget_sizes(xx,yy):
@@ -154,12 +172,11 @@ def reset_widget_sizes(xx,yy):
 
 # do things when tab button is clicked
 def sel_tab(tbn):
-	global cur_tab, wx, wy, update_timer
+	global cur_tab, wx, wy, update_log
 	cur_tab = tbn
 	wx = root.winfo_width()
 	wy = root.winfo_height()
-	update_timer = True
-	
+	update_log = True	
 	update_cur_tab_log()
 	# change background colors of tab buttons
 	# change order of command button frames
@@ -174,7 +191,6 @@ def sel_tab(tbn):
 		if tbi != cur_tab:
 			exec("f_bot_%r.grid(sticky=N+S+E+W)" % tbi)
 	reset_widget_sizes(wx,wy)
-	timed_log_update()
 	#print "changed tab to %r" % cur_tab
 	
 # return list with color values
@@ -225,13 +241,13 @@ def files_folders():
 # update text field if log file has changed
 def timed_log_update():
 	#print "timed_log_update called"
-	global tab_log_old_size, update_timer
-	if update_timer:
+	global tab_log_old_size, update_log
+	if update_log:
 		if tab_log_old_size != os.path.getsize(cur_tab_log_file()):
 			tab_log_old_size = os.path.getsize(cur_tab_log_file())
 			update_cur_tab_log()
 			#print "tab text updated bacause log file has new content"
-		root.after(2000, timed_log_update)
+	root.after(2000, timed_log_update)
 
 # root frame
 startup = True
@@ -244,7 +260,7 @@ bot_min = 45
 top_sash_loc = 45
 bot_sash_loc = (wy - 45)
 tab_log_old_size = 0
-update_timer  = False
+update_log  = False
 root = Tk()
 root.geometry('%rx%r+300+200' % (wx, wy))
 root.title("MultiButtonProg")
