@@ -27,8 +27,15 @@ Feel free to contact me: <virx15@gmail.com>
 2. Development task priority
 ================================================
  - Title from configuration file name.
- - Support different configuration files and can change them when program running.
  - Subprocess monitoring: count indicator of running processes, stop button to close running process.
  - Each row in log file get ID to know what process sent it.
  - Log file filter interface to show/hide messages from different subprocesses.
+ 
+3. Instructions
+================================================
+ - If running compiled version you can execute "mbp" file with mouse, else 
+   run "python mbp.py" in terminal.
+ - The "mbp.pyc" file is compiled but i havent tested it in other computers, 
+   so you maybe need to install tkinter library for python.
+ - Please report any errors.
  
