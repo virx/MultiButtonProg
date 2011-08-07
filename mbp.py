@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from Tkinter import *
 import subprocess
 import os
 import sys
 import time
 import shutil
+from Tkinter import *
 from cStringIO import StringIO
 
 print """MultiButtonProg  Copyright (C) 2011  Virgo Pihlapuu
@@ -45,6 +45,13 @@ def read_conf():
 	with open('config.txt', 'r') as f:
 		fs = f.read()
 	return fs
+
+def get_new_conf(conf_fn):
+	fs = ''
+	with open(conf_fn, 'r') as f:
+		fs = f.read()
+	with open('config.txt', 'w') as f:
+		f.write(fs)
 
 # clean string from lines with hashes
 def clean_hash_lines(bad_s):
@@ -203,7 +210,7 @@ def make_colors(n):
 
 # make folder and files for tab logs
 def files_folders():
-	folder_list = ['log','log/backup','scripts','scripts/py','scripts/sh','scripts/cmd']
+	folder_list = ['log','config','log/backup','scripts','scripts/py','scripts/sh','scripts/cmd']
 	for folder in folder_list:
 		# try to make log dir
 		try:
@@ -249,93 +256,99 @@ def timed_log_update():
 			#print "tab text updated bacause log file has new content"
 	root.after(2000, timed_log_update)
 
-# root frame
-startup = True
-wx = 600
-wy = 500
-scl = 100 # scale widget sizes from 1 to 100 (scale thing not working) <FIX ME>
-top_min = 45
-cent_min = 55
-bot_min = 45
-top_sash_loc = 45
-bot_sash_loc = (wy - 45)
-tab_log_old_size = 0
-update_log  = False
-root = Tk()
-root.geometry('%rx%r+300+200' % (wx, wy))
-root.title("MultiButtonProg")
+restart = True
+while restart:
+	# root frame
+	restart = False
+	startup = True
+	wx = 600
+	wy = 500
+	scl = 100 # scale widget sizes from 1 to 100 (scale thing not working) <FIX ME>
+	top_min = 45
+	cent_min = 55
+	bot_min = 45
+	top_sash_loc = 45
+	bot_sash_loc = (wy - 45)
+	tab_log_old_size = 0
+	update_log  = False
+	root = Tk()
+	root.geometry('%rx%r+300+200' % (wx, wy))
+	root.title("MultiButtonProg")
 
-m1 = PanedWindow(root, orient=VERTICAL, bg='#fb8')
-m1.bind("<Configure>", change_window)
-m1.pack(side=TOP, fill=BOTH, expand=1)
+	m1 = PanedWindow(root, orient=VERTICAL, bg='#fb8')
+	m1.bind("<Configure>", change_window)
+	m1.pack(side=TOP, fill=BOTH, expand=1)
 
-top = LabelFrame(m1, bg='#dbb', text="Tabs")
-m1.add(top)
+	top = LabelFrame(m1, bg='#dbb', text="Tabs")
+	m1.add(top)
 
-center = LabelFrame(m1, bg='#bdb', text="Text / Log")
-m1.add(center)
+	center = LabelFrame(m1, bg='#bdb', text="Text / Log")
+	m1.add(center)
 
-bottom = LabelFrame(m1, bg='#bbd', text="Command buttons")
-m1.add(bottom)
+	bottom = LabelFrame(m1, bg='#bbd', text="Command buttons")
+	m1.add(bottom)
 
-m1.paneconfigure(top, minsize=top_min)
-m1.paneconfigure(center, minsize=cent_min)
-m1.paneconfigure(bottom, minsize=bot_min)
+	m1.paneconfigure(top, minsize=top_min)
+	m1.paneconfigure(center, minsize=cent_min)
+	m1.paneconfigure(bottom, minsize=bot_min)
 
-# top widgets
-f_top = Frame(top)
-f_top.grid(row=0, column=0, sticky=E+W)
+	# top widgets
+	f_top = Frame(top)
+	f_top.grid(row=0, column=0, sticky=E+W)
 
-# center widgets
-t_sb_y = Scrollbar(center)
-t_sb_y.grid(row=0, column=1, sticky=N+E+S)
+	# center widgets
+	t_sb_y = Scrollbar(center)
+	t_sb_y.grid(row=0, column=1, sticky=N+E+S)
 
-t_sb_x = Scrollbar(center, orient=HORIZONTAL)
-t_sb_x.grid(row=1, column=0, sticky=W+S+E)
+	t_sb_x = Scrollbar(center, orient=HORIZONTAL)
+	t_sb_x.grid(row=1, column=0, sticky=W+S+E)
 
-t = Text(center, wrap=NONE, xscrollcommand=t_sb_x.set, yscrollcommand=t_sb_y.set)
-t.grid(row=0, column=0, sticky=N+E+S+W)
+	t = Text(center, wrap=NONE, xscrollcommand=t_sb_x.set, yscrollcommand=t_sb_y.set)
+	t.grid(row=0, column=0, sticky=N+E+S+W)
 
-t_sb_y.config(command=t.yview)
-t_sb_x.config(command=t.xview)
+	t_sb_y.config(command=t.yview)
+	t_sb_x.config(command=t.xview)
 
-center.columnconfigure( 0, weight=1000 )
-center.rowconfigure( 0, weight=1000 )
+	center.columnconfigure( 0, weight=1000 )
+	center.rowconfigure( 0, weight=1000 )
 
-# bottom widgets
-f_bottom = Frame(bottom)
-f_bottom.grid(row=0, column=0, sticky=E+W)
+	# bottom widgets
+	f_bottom = Frame(bottom)
+	f_bottom.grid(row=0, column=0, sticky=E+W)
 
-cur_tab = 0
-# arrays for tab and command buttons
-tabs, coms = parse_conf()
+	cur_tab = 0
+	# arrays for tab and command buttons
+	tabs, coms = parse_conf()
 
-com_tab_colors = make_colors(len(tabs))
-files_folders()
+	# get different colors for all tabs
+	com_tab_colors = make_colors(len(tabs))
+	files_folders()
 
-# init tab buttons and command button frames
-tn = 0
-for tab in tabs:
-	exec("tbb_%r=Button(f_top, text=%r, bg=%r, command=lambda t_%r=%r: sel_tab(t_%r))" % (tn, tabs[tn][0], com_tab_colors[tn], tn, tn, tn))
-	exec("tbb_%r.grid(row=0, column=%r, sticky=W)" % (tn, tn))	
-	exec("f_bot_%r=Frame(f_bottom, bg=%r)" % (tn, com_tab_colors[tn]))
-	exec("f_bot_%r.grid(sticky=E+W)" % (tn))
-	
-	# init command buttons
-	ci = 0
-	b_row = 0
-	b_col = 0
-	for cm in coms:
-		for n in range(0,(len(tabs[tn][1]))):
-			if cm[1].strip() == tabs[tn][1][n].strip('\n'):
-				if b_col > 5:
-					b_col = 0
-					b_row += 1
-				script_type = cm[0]
-				exec("cmb_%r_%r=Button(f_bot_%r, text=%r, bg=%r, command=lambda c_%r=%r: call_com_" % (tn, n, tn, cm[1], com_tab_colors[tn], ci, ci) + script_type +"(c_%r))" % ci)
-				exec("cmb_%r_%r.grid(row=%r, column=%r, sticky=W+E)" % (tn, n, b_row, b_col))
-		ci += 1
-	tn += 1
+	# init tab buttons and command button frames
+	tn = 0
+	for tab in tabs:
+		exec("tbb_%r=Button(f_top, text=%r, bg=%r, command=lambda t_%r=%r: sel_tab(t_%r))" % (tn, tabs[tn][0], com_tab_colors[tn], tn, tn, tn))
+		exec("tbb_%r.grid(row=0, column=%r, sticky=W)" % (tn, tn))	
+		exec("f_bot_%r=Frame(f_bottom, bg=%r)" % (tn, com_tab_colors[tn]))
+		exec("f_bot_%r.grid(sticky=E+W)" % (tn))
+		
+		# init command buttons
+		ci = 0
+		b_row = 0
+		b_col = 0
+		for cm in coms:
+			for n in range(0,(len(tabs[tn][1]))):
+				if cm[1].strip() == tabs[tn][1][n].strip('\n'):
+					if b_col > 5:
+						b_col = 0
+						b_row += 1
+					script_type = cm[0]
+					exec("cmb_%r_%r=Button(f_bot_%r, text=%r, bg=%r, command=lambda c_%r=%r: call_com_" % (tn, n, tn, cm[1], com_tab_colors[tn], ci, ci) + script_type +"(c_%r))" % ci)
+					exec("cmb_%r_%r.grid(row=%r, column=%r, sticky=W+E)" % (tn, n, b_row, b_col))
+			ci += 1
+		tn += 1
 
-# start main loop
-root.mainloop()
+	# start main loop
+	root.mainloop()
+
+

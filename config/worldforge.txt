@@ -10,15 +10,20 @@ Open_conf
 Save_conf
 Overwrite_this_log
 Backup_logs
+Reload_UI
 WorldForge_UI
 Sample_UI
-Reload_UI
 
-|tab|sample_tab|
-term_hello
-py_hello
-start_firefox_x2
-kill_firefox
+|tab|Hammer|
+Refresh_Hammer
+
+|tab|cyphesis|
+start_cyphesis
+kill_cyphesis
+
+|tab|ember|
+start_ember
+kill_ember
 
 |command|py|Open_conf|
 global update_log
@@ -30,10 +35,12 @@ t.delete(0.0, END)
 t.insert(END, fs)
 print 'config.txt open'
 
-|command|py|Reload_UI|
-global restart
-restart = True
-root.destroy()
+|command|py|Save_conf|
+ts=t.get('0.0','10000.1000')
+f=open('config/sample.txt','w')
+f.write(ts)
+f.close()
+print 'config.txt saved ...'
 
 |command|py|Sample_UI|
 get_new_conf('config/sample.txt')
@@ -43,27 +50,35 @@ print 'Sample config loaded. Restart script or hit Reload_UI to see changes.'
 get_new_conf('config/worldforge.txt')
 print 'WorldForge config loaded. Restart script or hit Reload_UI to see changes.'
 
-|command|py|Save_conf|
-ts=t.get('0.0','10000.1000')
-f=open('config/sample.txt','w')
-f.write(ts)
-f.close()
-print 'config.txt saved ...'
+|command|py|Reload_UI|
+global restart
+restart = True
+root.destroy()
 
-|command|sh|term_hello|
-echo "Hello1"
-echo "Hello2"
+|command|sh|Refresh_Hammer|
+echo 'get new hammer from git <not working>'
 
-|command|sh|kill_firefox|
-killall firefox-bin
+|command|sh|start_cyphesis|
+export LD_LIBRARY_PATH=~/wf/local/lib:$LD_LIBRARY_PATH
+echo 'LD_LIBRARY_PATH set'
+~/wf/local/bin/cyphesis
+echo 'cyphesis run finished'
 
-|command|sh|firefox|
-firefox
-echo 'firefox started, but is closed now.'
+|command|sh|start_ember|
+export LD_LIBRARY_PATH=~/wf/local/lib:$LD_LIBRARY_PATH
+echo 'LD_LIBRARY_PATH set'
+~/wf/local/bin/ember
+echo 'ember run finished'
 
-|command|py|py_hello|
-print "Hello1"
-print "Hello2"
+|command|sh|kill_cyphesis|
+killall cyphesis
+killall cyphesis.bin
+echo 'cyphesis killed'
+
+|command|sh|kill_ember|
+killall ember
+killall ember.bin
+echo 'ember killed. '
 
 |command|py|Overwrite_this_log|
 fn = cur_tab_log_file()
