@@ -17,9 +17,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Any kind of feedback or developing help is welcome.
 Feel free to contact me: <virx15@gmail.com>
 
-1. Description
+1. Program Description
 ================================================
  - Execute cunfigurable terminal command sequences and python scripts with button click.
  - Command sequence buttons can be sectioned into different tabs.
  - Creates all necessary script files and folders.
  - Tab and command buttons are created according to config.txt file when starting program.
+
+2. Development task priority
+================================================
+ - Title from configuration file name.
+ - Support different configuration files and can change them when program running.
+ - Subprocess monitoring: count indicator of running processes, stop button to close running process.
+ - Each row in log file get ID to know what process sent it.
+ - Log file filter interface to show/hide messages from different subprocesses.
+ 
